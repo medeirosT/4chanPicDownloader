@@ -1,50 +1,59 @@
 <?php
 
-set_time_limit(9999999);	// If you have a slow internet this is a life saver!
 
 // Input URL HERE :
-$url = "http://boards.4chan.org/b/thread/547204940";
+$url = "http://boards.4chan.org/g/thread/42228391";
 
 
 // DO NOT EDIT ANYTHING BELOW THIS LINE!
+// --------------------------------------
+
+set_time_limit(0);							// If you have a slow internet this is a life saver!
+
 echo "Grabbing data...\n";
 
-$html = file_get_contents($url);
+if ( $html = file_get_contents( $url ) ){
 
-echo "Exploding data...\n";
+	echo "Exploding data...\n";
 
-$html = str_replace('"',"",$html);
+	preg_match_all('/(")(\\/)(\\/)(i\\.4cdn\\.org).*?(")/is', $html, $results);	// Just regex the files we're looking for.
 
-$html = explode(" ", $html);
+	$results = array_values(array_unique($results[0]));		// Clean results from REGEX
 
-$urls = array();
+	$totalResults = count($results);				// Get number of clean results
 
-echo "Finding URLs...\n";
+	foreach ($results as $currentResult => $result){
+	
+		$currentResult++;					// So it will show the right number in output, not index;
+		$result = 'http:' . trim($result, '"');			// Clean out quotes from URL and add HTTP to it
 
-foreach ($html as $line){
+		$filename = basename($result);				// Get filename from URL.
 
-	if(strpos($line, "i.4cdn.org") > -1 ){
+		echo "[$currentResult/$totalResults] $filename ";	// Simple echo to show user current position within thread
+
+		try{	
+			$fileData = file_get_contents($result);					// Attempt to grab file from site's CDN
 		
-		$url =  substr($line, 7);
-		$filename = substr(strrchr($line, "/"),1);
-		
-		$urls[$filename] = $url;
+			if( $writeResult = file_put_contents($filename, $fileData) ){		// Attempt to write result to file
+			
+				echo ".. OK!\n";
 
+			} else {
+
+				echo ".. ERROR!\n";
+
+			}	
+		} catch (Exception $e) {
+
+			echo ".. ERROR : " . $e->getMessage() . "\n";
+		}
+	
 	}
-}
 
-unset($html, $line, $filename, $url); // small cleanup
+	echo "Done!";
 
-echo "Got " . count($urls) . " Images! Starting Download...\n";
-$row = 1;
-$total = count($urls);
+} else {
 
-foreach ($urls as $filename => $url){
-
-	echo "[$row/$total] $filename\n";
-	$data = file_get_contents("http://" . $url );
-	file_put_contents( "./" . $filename,$data);
-	$row++;
+	echo "ERROR : Thread possibly 404'd!";	
 
 }
-
