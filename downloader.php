@@ -53,8 +53,15 @@ if ( $html = file_get_contents( $url ) ){
 		$result = 'http:' . trim( $result, '"' );		// Clean out quotes from URL and add HTTP to it
 
 		$filename = basename( $result );				// Get filename from URL.
-
+		
 		echo "[$currentResult/$totalResults] $filename ";	// Simple echo to show user current position within thread
+
+		if ( file_exists( $filename ) ) {
+
+			echo ".. Exists, ignoring!\n";
+			continue;
+
+		}
 
 		try{	
 			$fileData = file_get_contents( $result );				// Attempt to grab file from site's CDN
