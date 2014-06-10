@@ -82,10 +82,10 @@ if ( $html = file_get_contents( $url ) ){
 	
 	}
 
-	echo "Done!";
+	echo "Done!\n";
 
 } else {
 
-	echo "ERROR : Thread possibly 404'd!";	
+	echo "ERROR : Thread possibly 404'd!\n";	
 
 }
