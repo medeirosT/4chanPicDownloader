@@ -61,7 +61,7 @@ if ( $html = file_get_contents( $url ) ){
 		
 			if( $writeResult = file_put_contents( $filename, $fileData ) ){		// Attempt to write result to file
 			
-				echo ".. OK!\n";
+				echo ".. OK! (". strlen($fileData)  . " bytes)\n";
 
 			} else {
 
